@@ -7,7 +7,7 @@ export default [
     languageOptions: {
       globals: {
         ...globals.node,
-        ...globals.jest, // <-- add jest globals so tests don't trigger no-undef etc.
+        ...globals.jest, 
       },
     },
   },
