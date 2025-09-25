@@ -27,6 +27,7 @@
     "supertest": "^7.1.4"
   },
   "dependencies": {
-    "dotenv": "^17.2.2"
+    "dotenv": "^17.2.2",
+    "passport": "^0.7.0"
   }
 }
