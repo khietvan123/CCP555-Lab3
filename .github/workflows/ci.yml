@@ -25,7 +25,12 @@ jobs:
           cache-dependency-path: fragments/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          if [ -f fragments/package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Run ESLint
         run: npm run lint
