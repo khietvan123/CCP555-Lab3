@@ -5,4 +5,3 @@ dist/
 .env
 fragments/.env
 fragments-ui/.env
-.DS_Store
