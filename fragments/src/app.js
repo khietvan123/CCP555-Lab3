@@ -1,5 +1,5 @@
 // src/app.js
-
+const unneededVariable = 'This variable is never used';
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
