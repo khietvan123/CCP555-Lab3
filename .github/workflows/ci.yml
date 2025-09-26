@@ -25,6 +25,10 @@ jobs:
       # [URL documentation]
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          # Fetch all history for all branches and tags
+          fetch-depth: 0
+          submodules: true
  
       # [URL documentation]
       - name: Setup node
