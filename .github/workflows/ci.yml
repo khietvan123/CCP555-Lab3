@@ -1,108 +1,40 @@
-# .github/workflows/ci.yml
 name: ci
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   lint:
-    name: ESLint (fragments)
+    name: ESLint
     runs-on: ubuntu-latest
-
-    # run commands inside the fragments folder by default
     defaults:
       run:
         working-directory: fragments
-
     steps:
-      - name: Check out code (no submodules)
-        uses: actions/checkout@v4
-        with:
-          submodules: false
-          fetch-depth: 0
-
-      - name: Setup Node.js (no auto-cache)
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-
-      - name: Detect fragments/package-lock.json
-        id: check_lock
-        run: |
-          if [ -f fragments/package-lock.json ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Restore node_modules cache (only if lockfile exists)
-        if: steps.check_lock.outputs.exists == 'true'
-        uses: actions/cache@v3
-        with:
-          path: fragments/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('fragments/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: |
-          if [ -f fragments/package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-
-      - name: Run ESLint
-        run: npm run lint
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm run lint
 
   unit-tests:
-    name: Unit Tests (fragments)
+    name: Unit Tests
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: fragments
-
     steps:
-      - name: Check out code (no submodules)
-        uses: actions/checkout@v4
-        with:
-          submodules: false
-          fetch-depth: 0
-
-      - name: Setup Node.js (no auto-cache)
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-
-      - name: Detect fragments/package-lock.json
-        id: check_lock2
-        run: |
-          if [ -f fragments/package-lock.json ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Restore node_modules cache (only if lockfile exists)
-        if: steps.check_lock2.outputs.exists == 'true'
-        uses: actions/cache@v3
-        with:
-          path: fragments/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('fragments/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: |
-          if [ -f fragments/package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-
-      - name: Run Tests
-        run: npm test
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm test
