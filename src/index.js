@@ -1,1 +1,0 @@
-// const unneededVariable = 'This variable is never used';
