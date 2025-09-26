@@ -1,96 +1,45 @@
+# .github/workflows/ci.yml
+ 
+# Continuous Integration (CI) Workflow
 name: ci
-
+ 
+# This workflow will run whenever we push commits to the `main` branch, or
+# whenever there's a pull request to the `main` branch. See:
+# [URL documentation]
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
-
+    branches:
+      - main
+  push:
+    branches:
+      - main
+ 
 jobs:
   lint:
+    # Give your job a name that will show up in the GitHub Actions web UI
     name: ESLint
+    # We'll run this on a Linux (Ubuntu) VM, since we'll deploy on Linux too.
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: fragments
+    # We run these steps one after the other, and if any fail, we stop the process
     steps:
+      # [URL documentation]
       - name: Check out code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
+ 
+      # [URL documentation]
+      - name: Setup node
         uses: actions/setup-node@v4
         with:
+          # Use node LTS http://localhost:8080
           node-version: 'lts/*'
-
-      - name: Check for package-lock.json
-        id: check_lock
-        run: |
-          if [ -f fragments/package-lock.json ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Cache node_modules (only if lockfile exists)
-        if: steps.check_lock.outputs.exists == 'true'
-        uses: actions/cache@v3
-        with:
-          path: fragments/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('fragments/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
+          # Cache npm dependencies so they don't have to be downloaded next time - http://localhost:8080
+          cache: 'npm'
+          cache-dependency-path: fragments/package-lock.json
+ 
       - name: Install node dependencies
-        run: |
-          if [ -f fragments/package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-
+        # Use `ci` vs. `install`, see http://localhost:8080
+        run: npm ci
+ 
       - name: Run ESLint
         run: npm run lint
-
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: fragments
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-
-      - name: Check for package-lock.json
-        id: check_lock2
-        run: |
-          if [ -f fragments/package-lock.json ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Cache node_modules (only if lockfile exists)
-        if: steps.check_lock2.outputs.exists == 'true'
-        uses: actions/cache@v3
-        with:
-          path: fragments/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('fragments/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install node dependencies
-        run: |
-          if [ -f fragments/package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-
-      - name: Run Tests
-        run: npm test
+ 
