@@ -34,7 +34,7 @@ jobs:
       # Run Hadolint GitHub Action
       - uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: lab5/fragments/Dockerfile
+          dockerfile: fragments/Dockerfile
 
   unit-tests:
     name: Unit Tests
