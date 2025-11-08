@@ -11,7 +11,7 @@ FROM node:20-slim AS build
 # Metadata: who maintains this image and what it's for
 # ------------------------------------------------------------
 LABEL maintainer="Khiet Van Phan <kvphan@myseneca.ca>"
-LABEL description="Fragments Node.js microservice optimized for CCP555 lab 6"
+LABEL description="Fragments Node.js microservice optimized for CCP555 lab 7"
 
 # Environment variables
 ENV PORT=8080 \
