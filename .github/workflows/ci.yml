@@ -80,6 +80,8 @@ jobs:
           SHA_TAG: sha-${{ github.sha }}
         uses: docker/build-push-action@v6
         with:
+          context: ./fragments
+          file: ./fragments/Dockerfile 
           push: true
           # Tag with commit SHA, main, and latest
           tags: |
