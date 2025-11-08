@@ -18,11 +18,7 @@ router.get('/', (req, res) => {
 
 router.get('/health', (req, res) => {
   // Client's shouldn't cache this response (always request it fresh)
-  res.json({
-    status: 'ok',
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-  });
+  res.setHeader('Cache-Control', 'no-cache');
 });
 
 router.use(`/v1`, authenticate(), require('./api'));
