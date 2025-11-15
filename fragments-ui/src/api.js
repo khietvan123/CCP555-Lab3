@@ -6,3 +6,12 @@ export async function getUserFragments(user) {
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return res.json();
 }
+
+export async function createFragment(user, type, content) {
+  return fetch(`${process.env.API_URL}/v1/fragments`, {
+    method: "POST",
+    headers: user.authorizationHeaders(type),
+    body: type === "application/json" ? JSON.stringify(JSON.parse(content)) : content
+  }).then(r => r.json());
+}
+

@@ -1,9 +1,13 @@
-// fragments/src/routes/api/index.js
 const express = require('express');
 const router = express.Router();
 
-// Mount specific API endpoints here
-// GET /v1/fragments -> handled by ./get.js
 router.get('/fragments', require('./get'));
+router.post('/fragments', require('./post'));
+
+router.get('/fragments/:id', require('./get-id'));
+
+router.get('/fragments/:id/info', require('./get-info'));
+
+router.get('/fragments/:id.:ext', require('./get-ext'));
 
 module.exports = router;

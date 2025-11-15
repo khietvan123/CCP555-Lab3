@@ -1,0 +1,111 @@
+/* BASIC PAGE RESET */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", Arial, sans-serif;
+  background: #f5f7fb;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  padding-top: 40px;
+}
+
+/* WRAPPER TO KEEP EVERYTHING CENTERED */
+body > * {
+  max-width: 650px;
+  width: 100%;
+}
+
+/* MAIN TITLE */
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+/* NAVIGATION */
+nav {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* BUTTONS */
+button {
+  padding: 10px 18px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+/* LOGIN BUTTON */
+#login {
+  background: #3498db;
+  color: #fff;
+}
+#login:hover {
+  background: #2980b9;
+}
+
+/* LOGOUT BUTTON */
+#logout {
+  background: #e74c3c;
+  color: #fff;
+  margin-top: 10px;
+}
+#logout:hover {
+  background: #c0392b;
+}
+
+/* USER SECTION */
+#user {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* GREETING TEXT */
+#user h2,
+#user p {
+  margin: 10px 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* INPUT AREAS LOOK NICER */
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+/* NICE CARD CONTAINERS (IF YOU ADD MORE UI LATER) */
+section {
+  margin-top: 20px;
+}
+
+/* LISTS FOR FRAGMENTS (IF USED LATER) */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+ul li {
+  background: #ecf0f1;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  text-align: left;
+  font-size: 0.95rem;
+}
