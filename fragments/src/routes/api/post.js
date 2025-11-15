@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     const type = req.headers['content-type'];
 
     // Validate type
-    if (!type.startsWith('text/') && type !== 'application/json') {
+    if (!type.startsWith('text/')) {
       return res.status(415).json({
         status: 'error',
         message: 'Unsupported type: only text/* or application/json allowed',
