@@ -4,7 +4,9 @@ const db = require('../data');
 class Fragments {
   constructor({ ownerId, type, size = 0 }) {
     this.id = crypto.randomUUID();
-    this.ownerId = ownerId;
+    this.ownerId = crypto.createHash('sha256')
+      .update(ownerId)
+      .digest('hex');
     this.type = type;
     this.size = size;
     this.created = new Date().toISOString();

@@ -1,12 +1,19 @@
 // src/routes/api/get.js
- 
+
 /**
  * Get a list of fragments for the current user
  */
+
+const crypto = require('crypto');
 const Fragment = require('../../model/fragments');
+
 module.exports = (req, res) => {
   try {
-    const ownerId = req.user; // set by authenticate middleware
+    // ⭐ FIX: ownerId must be hashed because POST stores fragments under hashed ownerId
+    const ownerId = crypto.createHash('sha256')
+      .update(req.user)
+      .digest('hex');
+
     const fragments = Fragment.byUser(ownerId);
 
     // expand=1 → return full metadata

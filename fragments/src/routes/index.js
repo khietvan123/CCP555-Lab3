@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
     status: 'ok',
     author,
     version,
-    githubUrl: 'github.com/khietvan123/CCP555-Lab3'
+    githubUrl: 'https://github.com/khietvan123/CCP555-Lab3'
   });
 });
 
