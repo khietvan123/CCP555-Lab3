@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/routes/api/get.js
 
 /**
@@ -7,16 +8,20 @@
 const crypto = require('crypto');
 const Fragment = require('../../model/fragments');
 
-module.exports = (req, res) => {
+// src/routes/api/get.js
+
+module.exports = async (req, res) => {
   try {
-    // ⭐ FIX: ownerId must be hashed because POST stores fragments under hashed ownerId
-    const ownerId = crypto.createHash('sha256')
-      .update(req.user)
-      .digest('hex');
+    // DO NOT HASH req.user
+    const fragments = await Fragment.byUser(req.user);
 
-    const fragments = Fragment.byUser(ownerId);
+    if (!Array.isArray(fragments)) {
+      return res.status(200).json({
+        status: 'ok',
+        fragments: []
+      });
+    }
 
-    // expand=1 → return full metadata
     if (req.query.expand === '1') {
       return res.status(200).json({
         status: 'ok',
@@ -24,7 +29,6 @@ module.exports = (req, res) => {
       });
     }
 
-    // default → only return IDs
     return res.status(200).json({
       status: 'ok',
       fragments: fragments.map((f) => f.id),
@@ -38,3 +42,4 @@ module.exports = (req, res) => {
     });
   }
 };
+

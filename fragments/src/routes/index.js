@@ -1,5 +1,4 @@
-//src/routes/index.js
-
+// src/routes/index.js
 const express = require('express');
 const router = express.Router();
 const { authenticate } = require('../auth');
@@ -22,7 +21,7 @@ router.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// MOUNT API HERE
+// Mount ALL v1 routes (including DELETE)
 router.use('/v1', authenticate(), require('./api'));
 
 module.exports = router;

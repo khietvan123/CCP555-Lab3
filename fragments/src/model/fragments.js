@@ -29,19 +29,18 @@ class Fragment {
   }
 
   async setData(buffer) {
-    this.size = buffer.length;
-    this.updated = new Date().toISOString();
+  this.size = buffer.length;
+  this.updated = new Date().toISOString();
 
-    // Write the raw data to storage (memory or S3)
-    await db.writeFragmentData(this.ownerId, this.id, buffer);
+  await db.writeFragmentData(this.ownerId, this.id, buffer);
+  db.updateFragment(this.ownerId, this);
+}
 
-    // Update metadata
-    db.updateFragment(this.ownerId, this);
-  }
 
-  async getData() {
-    return db.readFragmentData(this.ownerId, this.id);
-  }
+async getData() {
+  return db.readFragmentData(this.ownerId, this.id);
+}
+
 
   static async byId(ownerId, id) {
     const hashed = crypto.createHash('sha256').update(ownerId).digest('hex');

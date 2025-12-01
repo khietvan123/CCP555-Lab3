@@ -1,49 +1,50 @@
+// src/routes/api/post.js
 const Fragments = require('../../model/fragments');
+const { createErrorResponse } = require('../../response');
 
-/**
- * POST /v1/fragments
- * Creates a new fragment
- */
 module.exports = async (req, res) => {
   try {
     const ownerId = req.user;
-    const type = req.headers['content-type'];
+    const type = req.get('Content-Type');
 
-    const isText = type.startsWith('text/');
+    // Supported: text/* or application/json
+    const isText = type && type.startsWith('text/');
     const isJson = type === 'application/json';
 
     if (!isText && !isJson) {
-      return res.status(415).json({
-        status: 'error',
-        message: 'Unsupported type: only text/* or application/json allowed',
-      });
+      return res
+        .status(415)
+        .json(createErrorResponse(415, 'Unsupported content type'));
     }
 
-    // Read raw request body
-    const chunks = [];
-    for await (const chunk of req) chunks.push(chunk);
-    const data = Buffer.concat(chunks);
+    
 
-    // Create fragment metadata + save
+    // req.body ALREADY contains raw body because express.raw/text is used
+    const data =
+      typeof req.body === 'string'
+        ? Buffer.from(req.body)
+        : Buffer.isBuffer(req.body)
+        ? req.body
+        : Buffer.from(JSON.stringify(req.body));
+
+    // Create + save metadata
     const fragment = new Fragments({ ownerId, type });
     fragment.save();
-    fragment.setData(data);
+
+    // Save data
+    await fragment.setData(data);
 
     const base = process.env.API_URL || 'http://localhost:8080';
     const location = `${base}/v1/fragments/${fragment.id}`;
 
-    res.status(201)
-      .location(location)
-      .json({
-        status: 'ok',
-        fragment: Fragments.expand(fragment),
-      });
-
+    return res.status(201).location(location).json({
+      status: 'ok',
+      fragment: Fragments.expand(fragment),
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      status: 'error',
-      message: 'Failed to create fragment'
-    });
+    return res
+      .status(500)
+      .json(createErrorResponse(500, 'Failed to create fragment'));
   }
 };

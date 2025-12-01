@@ -13,6 +13,8 @@ const authenticate = require('./auth');
 const logger = require('./logger');
 // Create an express app instance we can use to attach middleware and HTTP routes
 const app = express();
+app.use(express.json());
+app.use(express.text({ type: 'text/*' }));
 
 // Use helmetjs security middleware
 app.use(helmet());

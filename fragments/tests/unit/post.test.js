@@ -26,7 +26,7 @@ describe("POST /v1/fragments", () => {
     const res = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
-      .set('Content-Type', 'application/json')
+      .set('Content-Type', 'application/pdf')
       .send(JSON.stringify({ a: 1 }));
 
     expect(res.status).toBe(415);

@@ -1,12 +1,13 @@
 // src/model/data/memory/index.js
-// In-memory storage for fragments + data
+// In-memory database for fragments
 
 const memory = {
-  fragments: {},      // { ownerId: [fragment metadata] }
-  data: {}            // { ownerId: { fragmentId: Buffer } }
+  fragments: {},
+  data: {},
 };
 
-// ---- Metadata ----
+// ----- METADATA FUNCTIONS -----
+
 function writeFragment(ownerId, fragment) {
   if (!memory.fragments[ownerId]) {
     memory.fragments[ownerId] = [];
@@ -23,30 +24,29 @@ function readFragment(ownerId, fragmentId) {
   return frags.find(f => f.id === fragmentId);
 }
 
-function updateFragment(ownerId, fragment) {
+function updateFragment(ownerId, updated) {
   const frags = memory.fragments[ownerId] || [];
-  const idx = frags.findIndex(f => f.id === fragment.id);
-  if (idx !== -1) frags[idx] = fragment;
+  const index = frags.findIndex(f => f.id === updated.id);
+  if (index !== -1) frags[index] = updated;
 }
 
-function deleteFragment(ownerId, fragmentId) {
-  if (!memory.fragments[ownerId]) return;
-  memory.fragments[ownerId] = memory.fragments[ownerId].filter(f => f.id !== fragmentId);
-}
+// ----- DATA FUNCTIONS -----
 
-// ---- Data ----
 function writeFragmentData(ownerId, fragmentId, buffer) {
-  if (!memory.data[ownerId]) {
-    memory.data[ownerId] = {};
-  }
+  if (!memory.data[ownerId]) memory.data[ownerId] = {};
   memory.data[ownerId][fragmentId] = buffer;
 }
 
 function readFragmentData(ownerId, fragmentId) {
-  return memory.data[ownerId]?.[fragmentId];
+  return memory.data[ownerId]?.[fragmentId] || null;
 }
 
-function deleteFragmentData(ownerId, fragmentId) {
+function deleteFragment(ownerId, fragmentId) {
+  if (memory.fragments[ownerId]) {
+    memory.fragments[ownerId] = memory.fragments[ownerId].filter(
+      f => f.id !== fragmentId
+    );
+  }
   if (memory.data[ownerId]) {
     delete memory.data[ownerId][fragmentId];
   }
@@ -57,8 +57,7 @@ module.exports = {
   readFragments,
   readFragment,
   updateFragment,
-  deleteFragment,
   writeFragmentData,
   readFragmentData,
-  deleteFragmentData,
+  deleteFragment,
 };
