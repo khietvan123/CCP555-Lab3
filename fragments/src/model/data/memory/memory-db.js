@@ -6,13 +6,16 @@ class MemoryDB {
     this.metadata = new Map();
   }
 
+  /* ------------------------------
+     RAW DATA STORAGE
+  ------------------------------ */
   async writeFragmentData(ownerId, id, data) {
     this.data.set(`${ownerId}/${id}`, data);
   }
 
   async readFragmentData(ownerId, id) {
     const key = `${ownerId}/${id}`;
-    if (!this.data.has(key)) throw new Error('not found');
+    if (!this.data.has(key)) return null;
     return this.data.get(key);
   }
 
@@ -20,16 +23,32 @@ class MemoryDB {
     this.data.delete(`${ownerId}/${id}`);
   }
 
-  async writeFragmentMetadata(ownerId, fragment) {
-    this.metadata.set(`${ownerId}/${fragment.id}`, fragment);
+  /* ------------------------------
+     METADATA STORAGE — REQUIRED API
+  ------------------------------ */
+
+  writeFragment(ownerId, fragment) {
+    if (!this.metadata.has(ownerId)) {
+      this.metadata.set(ownerId, []);
+    }
+    const list = this.metadata.get(ownerId);
+    list.push(fragment);
+    return fragment;
   }
 
-  async readFragmentMetadata(ownerId, id) {
-    return this.metadata.get(`${ownerId}/${id}`);
+  readFragments(ownerId) {
+    return this.metadata.get(ownerId) || [];
   }
 
-  async deleteFragmentMetadata(ownerId, id) {
-    this.metadata.delete(`${ownerId}/${id}`);
+  readFragment(ownerId, id) {
+    const list = this.readFragments(ownerId);
+    return list.find((f) => f.id === id) || null;
+  }
+
+  deleteFragment(ownerId, id) {
+    const list = this.readFragments(ownerId);
+    const idx = list.findIndex((f) => f.id === id);
+    if (idx >= 0) list.splice(idx, 1);
   }
 }
 

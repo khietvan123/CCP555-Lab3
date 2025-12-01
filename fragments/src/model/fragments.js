@@ -28,13 +28,17 @@ class Fragment {
     db.writeFragment(this.ownerId, this);
   }
 
-  async setData(buffer) {
+async setData(buffer) {
   this.size = buffer.length;
   this.updated = new Date().toISOString();
 
+  // save binary/text data
   await db.writeFragmentData(this.ownerId, this.id, buffer);
-  db.updateFragment(this.ownerId, this);
+
+  // update metadata (overwrite existing entry)
+  db.writeFragment(this.ownerId, this);
 }
+
 
 
 async getData() {
