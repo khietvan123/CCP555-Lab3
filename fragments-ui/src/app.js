@@ -60,7 +60,7 @@ async function init() {
     }
 
     try {
-      const result = await createFragment(user, type, content);
+      const result = await createFragment(type, content);
       alert("Fragment created successfully!");
       await loadFragments(user);
     } catch (err) {
