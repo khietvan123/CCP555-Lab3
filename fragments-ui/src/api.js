@@ -28,4 +28,3 @@ export async function createFragment(type, content) {
   if (!res.ok) throw new Error("Unauthorized");
   return res.json();
 }
-
