@@ -52,6 +52,15 @@ function deleteFragment(ownerId, fragmentId) {
   }
 }
 
+// Delete only the stored data (used by fragment.delete())
+function deleteFragmentData(ownerId, fragmentId) {
+  if (memory.data[ownerId]) {
+    delete memory.data[ownerId][fragmentId];
+  }
+}
+
+//comment to push
+
 module.exports = {
   writeFragment,
   readFragments,
@@ -60,4 +69,5 @@ module.exports = {
   writeFragmentData,
   readFragmentData,
   deleteFragment,
+  deleteFragmentData,
 };
