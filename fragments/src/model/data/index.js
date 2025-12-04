@@ -1,7 +1,10 @@
 // src/model/data/index.js
 
-// If AWS_REGION is set in environment variables,
-// use the AWS backend (S3). Otherwise use in-memory backend.
-module.exports = process.env.AWS_REGION
-  ? require('./aws')
-  : require('./memory');
+// Only use AWS backend when full AWS config is present; otherwise default to in-memory.
+const hasAwsConfig =
+  process.env.AWS_REGION &&
+  process.env.AWS_S3_BUCKET_NAME &&
+  process.env.AWS_ACCESS_KEY_ID &&
+  process.env.AWS_SECRET_ACCESS_KEY;
+
+module.exports = hasAwsConfig ? require('./aws') : require('./memory');
