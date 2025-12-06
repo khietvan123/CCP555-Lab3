@@ -6,12 +6,12 @@
  */
 const Fragment = require('../../model/fragments');
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
   try {
     const ownerId = req.user;
     const id = req.params.id;
 
-    const fragments = Fragment.byUser(ownerId);
+    const fragments = await Fragment.byUser(ownerId);
     const fragment = fragments.find((f) => f.id === id);
 
     if (!fragment) {

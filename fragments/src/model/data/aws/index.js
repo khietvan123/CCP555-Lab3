@@ -2,18 +2,23 @@
 // src/model/data/aws/index.js
 
 /**
- * AWS BACKEND — stores metadata in memory, raw fragment data in S3
+ * AWS BACKEND — stores metadata in DynamoDB, raw fragment data in S3
  */
-
-const MemoryDB = require('../memory/memory-db');
-const metadataDB = new MemoryDB();
 
 const s3Client = require('./s3Client');
 const {
   PutObjectCommand,
   GetObjectCommand,
-  DeleteObjectCommand
+  DeleteObjectCommand,
 } = require('@aws-sdk/client-s3');
+
+const ddbDocClient = require('./ddbDocClient');
+const {
+  PutCommand,
+  GetCommand,
+  QueryCommand,
+  DeleteCommand,
+} = require('@aws-sdk/lib-dynamodb');
 
 const logger = require('../../../logger');
 
@@ -30,39 +35,89 @@ function streamToBuffer(stream) {
 }
 
 /* ============================================================================
-   METADATA STORAGE (IN MEMORY)
-   Lab expects these to exist when AWS backend is active.
+   METADATA STORAGE (DYNAMODB)
    ========================================================================== */
 
-/**
- * Save metadata for a fragment
- */
-function writeFragment(ownerId, fragment) {
-  return metadataDB.writeFragment(ownerId, fragment);
+// Writes a fragment to DynamoDB. Returns a Promise.
+async function writeFragment(ownerId, fragment) {
+  const item = {
+    ownerId,
+    id: fragment.id,
+    type: fragment.type,
+    size: fragment.size,
+    created: fragment.created,
+    updated: fragment.updated,
+  };
+
+  const params = {
+    TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+    Item: item,
+  };
+
+  const command = new PutCommand(params);
+
+  try {
+    return await ddbDocClient.send(command);
+  } catch (err) {
+    logger.warn({ err, params, fragment }, 'error writing fragment to DynamoDB');
+    throw err;
+  }
 }
 
-/**
- * Return all fragments for a user
- */
-function readFragments(ownerId) {
-  return metadataDB.readFragments(ownerId);
+// Return all fragments for a user
+async function readFragments(ownerId) {
+  const params = {
+    TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+    KeyConditionExpression: 'ownerId = :ownerId',
+    ExpressionAttributeValues: {
+      ':ownerId': ownerId,
+    },
+  };
+
+  const command = new QueryCommand(params);
+
+  try {
+    const data = await ddbDocClient.send(command);
+    return data?.Items || [];
+  } catch (err) {
+    logger.error({ err, params }, 'error getting fragments from DynamoDB');
+    throw err;
+  }
 }
 
-/**
- * Return one fragment by ID
- */
-function readFragment(ownerId, id) {
-  const list = metadataDB.readFragments(ownerId);
-  return list.find((f) => f.id === id);
+// Return one fragment by ID
+async function readFragment(ownerId, id) {
+  const params = {
+    TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+    Key: { ownerId, id },
+  };
+
+  const command = new GetCommand(params);
+
+  try {
+    const data = await ddbDocClient.send(command);
+    return data?.Item;
+  } catch (err) {
+    logger.warn({ err, params }, 'error reading fragment from DynamoDB');
+    throw err;
+  }
 }
 
-/**
- * Delete fragment metadata only
- */
-function deleteFragment(ownerId, id) {
-  const list = metadataDB.readFragments(ownerId);
-  const index = list.findIndex((f) => f.id === id);
-  if (index >= 0) list.splice(index, 1);
+// Delete fragment metadata only
+async function deleteFragment(ownerId, id) {
+  const params = {
+    TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+    Key: { ownerId, id },
+  };
+
+  const command = new DeleteCommand(params);
+
+  try {
+    return ddbDocClient.send(command);
+  } catch (err) {
+    logger.warn({ err, params }, 'error deleting fragment from DynamoDB');
+    throw err;
+  }
 }
 
 /* ============================================================================

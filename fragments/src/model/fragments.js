@@ -25,19 +25,19 @@ class Fragment {
   }
 
   save() {
-    db.writeFragment(this.ownerId, this);
+    return db.writeFragment(this.ownerId, this);
   }
 
-async setData(buffer) {
-  this.size = buffer.length;
-  this.updated = new Date().toISOString();
+  async setData(buffer) {
+    this.size = buffer.length;
+    this.updated = new Date().toISOString();
 
-  // save binary/text data
-  await db.writeFragmentData(this.ownerId, this.id, buffer);
+    // save binary/text data
+    await db.writeFragmentData(this.ownerId, this.id, buffer);
 
-  // update metadata (overwrite existing entry)
-  db.writeFragment(this.ownerId, this);
-}
+    // update metadata (overwrite existing entry)
+    await db.writeFragment(this.ownerId, this);
+  }
 
 
 
@@ -48,12 +48,25 @@ async getData() {
 
   static async byId(ownerId, id) {
     const hashed = crypto.createHash('sha256').update(ownerId).digest('hex');
-    return db.readFragment(hashed, id);
+    const item = await db.readFragment(hashed, id);
+    if (!item) {
+      return undefined;
+    }
+    // Reconstruct Fragment instance from DynamoDB item
+    const fragment = Object.create(Fragment.prototype);
+    Object.assign(fragment, item);
+    return fragment;
   }
 
   static async byUser(ownerId) {
     const hashed = crypto.createHash('sha256').update(ownerId).digest('hex');
-    return db.readFragments(hashed);
+    const items = await db.readFragments(hashed);
+    // Reconstruct Fragment instances from DynamoDB items
+    return items.map((item) => {
+      const fragment = Object.create(Fragment.prototype);
+      Object.assign(fragment, item);
+      return fragment;
+    });
   }
 
   async delete() {
